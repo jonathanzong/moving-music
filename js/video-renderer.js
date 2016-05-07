@@ -33,7 +33,8 @@ VideoRenderer.prototype.setManager = function(manager) {
   // Create a trackObject for each track in the manager.
   for (var id in manager.tracks) {
     var track = manager.tracks[id];
-    var object = this.addPointCloud({color: track.color});
+    // var object = this.addPointCloud({color: track.color});
+    var object = this.addSphere();
     this.trackObjects[id] = object;
   }
 };
@@ -76,6 +77,9 @@ VideoRenderer.prototype.init = function() {
   // Add the camera to the scene.
   scene.add(camera);
 
+  var ambient = new THREE.AmbientLight( 0xffffff );
+  scene.add( ambient );      
+
   // Set the background color of the scene.
   renderer.setClearColor(0x000000, 1);
 
@@ -91,16 +95,23 @@ VideoRenderer.prototype.init = function() {
   this.renderer = renderer;
   this.effect = effect;
   this.controls = controls;
+
+  // texture
+
+  this.textureEquirec = THREE.ImageUtils.loadTexture('img/5097827282_88e4de0f65_o.jpg');
+  this.textureEquirec.mapping = THREE.EquirectangularRefractionMapping;
+  this.textureEquirec.magFilter = THREE.LinearFilter;
+  this.textureEquirec.minFilter = THREE.LinearMipMapLinearFilter;
 };
 
-VideoRenderer.prototype.addLight = function() {
+VideoRenderer.prototype.addLight = function(x, y, z) {
   // create a point light
   var pointLight = new THREE.PointLight(0xFFFFFF);
 
   // set its position
-  pointLight.position.x = 0;
-  pointLight.position.y = 0;
-  pointLight.position.z = 0;
+  pointLight.position.x = x || 0;
+  pointLight.position.y = y || 0;
+  pointLight.position.z = z || 0;
 
   // add to the scene
   this.scene.add(pointLight);
@@ -144,47 +155,29 @@ VideoRenderer.prototype.addPointCloud = function(params) {
   return cloud;
 };
 
-VideoRenderer.prototype.addSphere = function(color) {
-  var radius = 50;
-  var segments = 16;
-  var rings = 16;
-
-  var sphereGeometry = new THREE.SphereGeometry( radius, segments, rings);
-  var sphereMaterial = new THREE.MeshLambertMaterial({color: color});
-  var sphere = new THREE.Mesh(sphereGeometry, sphereMaterial);
+VideoRenderer.prototype.addSphere = function() {
+  var geometry = new THREE.SphereGeometry( 0.01, 24, 24 );
+  var sphereMaterial = new THREE.MeshLambertMaterial( { envMap: this.textureEquirec } );
+  var sphere = new THREE.Mesh( geometry, sphereMaterial );
 
   this.scene.add(sphere);
   return sphere;
 };
 
-// Largely from http://learningthreejs.com/blog/2011/08/15/lets-do-a-sky/
 VideoRenderer.prototype.addSkybox = function() {
-  // Load the cube textures.
-  //var prefix = 'img/';
-  var prefix = 'img/';
-  var urls = ['posx.jpeg', 'negx.jpeg', 'posy.jpeg', 'negy.jpeg', 'posz.jpeg', 'negz.jpeg'];
-  for (var i = 0; i < urls.length; i++) {
-    urls[i] = prefix + urls[i];
-  }
-  var cubemap = THREE.ImageUtils.loadTextureCube(urls);
-  cubemap.format = THREE.RGBFormat;
-
-  // Initialize the shader.
-  var shader = THREE.ShaderLib['cube'];
-  shader.uniforms['tCube'].value = cubemap
-
-  var material = new THREE.ShaderMaterial({
-    fragmentShader: shader.fragmentShader,
-    vertexShader: shader.vertexShader,
-    uniforms: shader.uniforms,
+  var equirectShader = THREE.ShaderLib[ "equirect" ];
+  var equirectMaterial = new THREE.ShaderMaterial( {
+    fragmentShader: equirectShader.fragmentShader,
+    vertexShader: equirectShader.vertexShader,
+    uniforms: equirectShader.uniforms,
     depthWrite: false,
     side: THREE.BackSide
-  });
+  } );
+  equirectMaterial.uniforms[ "tEquirect" ].value = this.textureEquirec;
 
-  // Build the skybox Mesh.
-  var skybox = new THREE.Mesh(new THREE.CubeGeometry(1000, 1000, 1000), material);
-  // Add it to the scene
+  var skybox = new THREE.Mesh( new THREE.BoxGeometry( 1000, 1000, 1000 ), equirectMaterial );
   this.scene.add(skybox);
+
   return skybox;
 };
 
@@ -306,21 +299,23 @@ VideoRenderer.prototype.addText_ = function(text) {
 
 VideoRenderer.prototype.animatePointCloud_ = function(id, cloud) {
   var track = this.manager.tracks[id];
-  var RADIUS = 1;
+  var RADIUS = 150;
   // To give even quiet tracks some motion.
   var FUDGE_FACTOR = 0.1;
   var radius = FUDGE_FACTOR + track.amplitude * RADIUS;
-  var now = new Date();
-  var vertices = cloud.geometry.vertices;
-  for (var i = 0; i < vertices.length; i++) {
-    var particle = vertices[i];
-    var time = (now - this.referenceTime) % particle.period;
-    var percent = time / particle.period;
-    var angle = percent * Math.PI * 2;
-    // Generate a position on a 2D circle.
-    particle.set(Math.cos(angle) * radius, 0, Math.sin(angle) * radius);
-    // Apply a quaternion to place the particle on the right orbit.
-    particle.applyQuaternion(particle.rotation);
-  }
-  cloud.geometry.verticesNeedUpdate = true;
+  // debugger;
+  // var now = new Date();
+  cloud.scale.set(radius, radius, radius);
+  // var vertices = cloud.geometry.vertices;
+  // for (var i = 0; i < vertices.length; i++) {
+  //   var particle = vertices[i];
+  //   var time = (now - this.referenceTime) % particle.period;
+  //   var percent = time / particle.period;
+  //   var angle = percent * Math.PI * 2;
+  //   // Generate a position on a 2D circle.
+  //   particle.set(Math.cos(angle) * radius, 0, Math.sin(angle) * radius);
+  //   // Apply a quaternion to place the particle on the right orbit.
+  //   particle.applyQuaternion(particle.rotation);
+  // }
+  // cloud.geometry.verticesNeedUpdate = true;
 };

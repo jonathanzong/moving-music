@@ -34,7 +34,6 @@ function start() {
   // Create a video renderer.
   video = new VideoRenderer({selector: 'body', overview: false});
   video.setManager(manager);
-  video.addLight();
   video.addSkybox();
 
   // Create the audio renderer.
@@ -93,13 +92,13 @@ function onAudioLoaded() {
 function onModeChanged(mode) {
   switch (mode) {
     case Choreographer.Modes.CLUSTERED:
-      video.toast('clustered', 2000);
+      // video.toast('clustered', 2000);
       break;
     case Choreographer.Modes.SURROUND:
-      video.toast('surround', 2000);
+      // video.toast('surround', 2000);
       break;
     case Choreographer.Modes.MOVING:
-      video.toast('moving', 2000);
+      // video.toast('moving', 2000);
       break;
   }
 }

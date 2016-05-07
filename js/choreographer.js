@@ -25,13 +25,14 @@ function Choreographer(opt_params) {
   this.mode_ = -1;
   this.callbacks_ = {};
 
-  if (set == 'speech') {
-    this.initVocal();
-  } else if (set == 'phoenix') {
-    this.initPhoenix();
-  } else if (set == 'jazz') {
-    this.initJazz();
-  }
+  // if (set == 'speech') {
+  //   this.initVocal();
+  // } else if (set == 'phoenix') {
+  //   this.initPhoenix();
+  // } else if (set == 'jazz') {
+  //   this.initJazz();
+  // }
+  this.initMyStuff();
 
   this.setMode(mode);
 }
@@ -121,6 +122,34 @@ Choreographer.prototype.initJazz = function() {
   this.manager.addTrack(bass);
   this.manager.addTrack(piano);
   this.manager.addTrack(snare);
+};
+
+Choreographer.prototype.initMyStuff = function() {
+  var set = 'funsies';
+  this.manager.addTrack(new MovingTrack({
+    src: this.getAudioFile(set, 'track2'),
+    color: 0xB8A795,
+  }));
+  this.manager.addTrack(new MovingTrack({
+    src: this.getAudioFile(set, 'track3'),
+    color: 0xB8A795,
+  }));
+  this.manager.addTrack(new MovingTrack({
+    src: this.getAudioFile(set, 'track1'),
+    color: 0xB8A795,
+  }));
+  this.manager.addTrack(new MovingTrack({
+    src: this.getAudioFile(set, 'track4'),
+    color: 0xB8A795,
+  }));
+  this.manager.addTrack(new MovingTrack({
+    src: this.getAudioFile(set, 'track5'),
+    color: 0xB8A795,
+  }));
+  this.manager.addTrack(new MovingTrack({
+    src: this.getAudioFile(set, 'track6'),
+    color: 0xB8A795,
+  }));
 };
 
 Choreographer.prototype.getAudioFile = function(set, basename) {

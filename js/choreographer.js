@@ -272,6 +272,8 @@ Choreographer.prototype.fire_ = function(callback) {
 };
 
 Choreographer.prototype.shouldShowActionReminder_ = function() {
+  // never show (for demo)
+  return false;
   // Never show the change reminder if the user already changed modes.
   if (this.didUserChangeMode) {
     return false;

@@ -150,7 +150,7 @@ AudioRenderer.prototype.render = function() {
     // Assume that the track object is present.
     var panner = this.panners[id];
     if (!panner) {
-      return console.error('No panner found for id: %s.', id);
+      return;
     }
 
     // Set the position of each track object as they spin.

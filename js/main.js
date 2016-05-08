@@ -87,6 +87,7 @@ function updateProgress() {
 function onAudioLoaded() {
   isLoaded = true;
   audio.start();
+  choreographer.setMode(Choreographer.Modes.MOVING, 16000);
 }
 
 function onModeChanged(mode) {

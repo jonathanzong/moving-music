@@ -299,9 +299,9 @@ VideoRenderer.prototype.addText_ = function(text) {
 
 VideoRenderer.prototype.animatePointCloud_ = function(id, cloud) {
   var track = this.manager.tracks[id];
-  var RADIUS = 150;
+  var RADIUS = 200;
   // To give even quiet tracks some motion.
-  var FUDGE_FACTOR = 0.1;
+  var FUDGE_FACTOR = 1;
   var radius = FUDGE_FACTOR + track.amplitude * RADIUS;
   // debugger;
   // var now = new Date();
